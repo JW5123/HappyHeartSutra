@@ -1,31 +1,25 @@
-let currentVisible = -1;
+let visibleColumns = [];
 
+// 點擊事件 - 每個卡片獨立顯示/隱藏
 document.querySelectorAll('.column').forEach((column, index) => {
     column.addEventListener('click', () => {
         const overlay = column.querySelector('.overlay');
         const content = column.querySelector('.column-content');
 
-        if (currentVisible !== -1 && currentVisible !== index) {
-            // 隱藏之前顯示的內容
-            const prevColumn = document.querySelector(`[data-index="${currentVisible}"]`);
-            if (prevColumn) {
-                const prevOverlay = prevColumn.querySelector('.overlay');
-                const prevContent = prevColumn.querySelector('.column-content');
-                prevOverlay.classList.remove('hidden');
-                prevContent.classList.remove('visible', 'highlight');
-            }
-        }
-
         if (overlay.classList.contains('hidden')) {
-            // 隱藏內容
+            // 當前是顯示狀態，點擊後隱藏
             overlay.classList.remove('hidden');
             content.classList.remove('visible', 'highlight');
-            currentVisible = -1;
+            // 從可見列表中移除
+            visibleColumns = visibleColumns.filter(i => i !== index);
         } else {
-            // 顯示內容
+            // 當前是隱藏狀態，點擊後顯示
             overlay.classList.add('hidden');
             content.classList.add('visible', 'highlight');
-            currentVisible = index;
+            // 添加到可見列表中
+            if (!visibleColumns.includes(index)) {
+                visibleColumns.push(index);
+            }
         }
     });
 });
@@ -34,11 +28,13 @@ function showAll() {
     document.querySelectorAll('.overlay').forEach(overlay => {
         overlay.classList.add('hidden');
     });
-    document.querySelectorAll('.column-content').forEach(content => {
+    document.querySelectorAll('.column-content').forEach((content, index) => {
         content.classList.add('visible');
         content.classList.remove('highlight');
+        if (!visibleColumns.includes(index)) {
+            visibleColumns.push(index);
+        }
     });
-    currentVisible = -1;
 }
 
 function hideAll() {
@@ -48,5 +44,5 @@ function hideAll() {
     document.querySelectorAll('.column-content').forEach(content => {
         content.classList.remove('visible', 'highlight');
     });
-    currentVisible = -1;
+    visibleColumns = [];
 }
